@@ -1,0 +1,10 @@
+../Core/Src/pisalec.c:31:6:DestroyPastir	3
+../Core/Src/pisalec.c:45:5:EatingFruit	4
+../Core/Src/pisalec.c:58:6:DrawSnakeField	3
+../Core/Src/pisalec.c:73:6:DrawSegmentAt	1
+../Core/Src/pisalec.c:80:6:DrawGame	2
+../Core/Src/pisalec.c:94:5:isOver	5
+../Core/Src/pisalec.c:110:6:TouchHandling	7
+../Core/Src/pisalec.c:133:6:Movement	9
+../Core/Src/pisalec.c:182:6:GameCycle	4
+../Core/Src/pisalec.c:205:6:Picasso	2

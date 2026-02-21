@@ -1,0 +1,3 @@
+../Core/Src/touchscreen.c:52:6:Touchscreen_demo	48	static
+../Core/Src/touchscreen.c:171:6:Touchscreen_DrawBackground_Circles	24	static
+../Core/Src/touchscreen.c:289:9:TouchScreen_GetTouchPosition	16	static
