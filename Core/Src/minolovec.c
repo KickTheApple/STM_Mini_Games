@@ -3,7 +3,7 @@
 
 #define X_AMOUNT 12
 #define Y_AMOUNT 8
-#define BOMB_COUNT 5
+#define BOMB_COUNT 10
 
 #define TOP_FLAG 1
 #define RIGHT_FLAG 2
@@ -39,7 +39,7 @@ void DrawMineField() {
 void DrawMineGame(bombarnik bombPolje[Y_AMOUNT][X_AMOUNT]) {
     UTIL_LCD_Clear(UTIL_LCD_COLOR_WHITE);
 
-    UTIL_LCD_SetFont(&Font12);
+    UTIL_LCD_SetFont(&Font24);
     UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_ORANGE);
     UTIL_LCD_SetBackColor(UTIL_LCD_COLOR_WHITE);
 
@@ -55,7 +55,7 @@ void DrawMineGame(bombarnik bombPolje[Y_AMOUNT][X_AMOUNT]) {
                 continue;
             }
             if (bombPolje[i][j].isBomb) {
-                UTIL_LCD_DrawRect(locationX, locationX, segmentMineX, segmentMineY, UTIL_LCD_COLOR_RED);
+                UTIL_LCD_FillRect(locationX, locationY, segmentMineX, segmentMineY, UTIL_LCD_COLOR_RED);
                 locationX += segmentMineX;
                 continue;
             }
@@ -105,8 +105,8 @@ void TouchMineHandling(bombarnik bombPolje[Y_AMOUNT][X_AMOUNT], TS_State_t* touc
     }
 }
 
-void Grid_greeter(bombarnik bombPolje[Y_AMOUNT][X_AMOUNT], bombarnik poljak, int x, int y) {
-    if (poljak.isBomb) {
+void Grid_greeter(bombarnik bombPolje[Y_AMOUNT][X_AMOUNT], bombarnik* poljak, int x, int y) {
+    if (poljak->isBomb) {
         return;
     }
 
@@ -178,13 +178,13 @@ void Grid_greeter(bombarnik bombPolje[Y_AMOUNT][X_AMOUNT], bombarnik poljak, int
             runningCount += bombPolje[y][x+1].isBomb;
         }
     }
-    poljak.neighbor = runningCount;
+    poljak->neighbor = runningCount;
 }
 
 void Neighbor_greeter(bombarnik bombPolje[Y_AMOUNT][X_AMOUNT]) {
     for (int i = 0; i < Y_AMOUNT; i++) {
         for (int j = 0; j < X_AMOUNT; j++) {
-            Grid_greeter(bombPolje, bombPolje[i][j], j, i);
+            Grid_greeter(bombPolje, &bombPolje[i][j], j, i);
         }
     }
 }
@@ -202,6 +202,10 @@ void Bombarnik_randomizer(bombarnik bombPolje[Y_AMOUNT][X_AMOUNT]) {
     int length = X_AMOUNT * Y_AMOUNT;
     int currentLocation = length;
 
+    for (int i = 0; i < BOMB_COUNT; i++) {
+        simplePolje[i].isBomb = 1;
+    }
+
     for (int i = 0; i < length; i++) {
         int j = rand() % currentLocation + i;
 
@@ -212,10 +216,14 @@ void Bombarnik_randomizer(bombarnik bombPolje[Y_AMOUNT][X_AMOUNT]) {
         currentLocation--;
     }
 
-    for (int i = 0; i < BOMB_COUNT; i++) {
-        simplePolje[i].isBomb = 1;
+    positioner = 0;
+    for (int i = 0; i < Y_AMOUNT; i++) {
+        for (int j = 0; j < X_AMOUNT; j++) {
+            bombPolje[i][j] = simplePolje[positioner++];
+        }
     }
 }
+
 
 void Bombarnik_starter(bombarnik bombPolje[Y_AMOUNT][X_AMOUNT]) {
     for (int i = 0; i < Y_AMOUNT; i++) {
@@ -245,6 +253,9 @@ void Bombica(int* gameTracker) {
 
     while (1) {
         TouchMineHandling(bombPolje, &state, gameTracker);
+        if (*gameTracker) {
+            break;
+        }
     }
 
 }
