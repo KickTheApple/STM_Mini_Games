@@ -7,8 +7,9 @@
 
 #include "main.h"
 
-#define X_AMOUNT 24
-#define Y_AMOUNT 12
+#define X_AMOUNT 12
+#define Y_AMOUNT 8
+#define RESERVED 50
 
 struct Pastir {
     int x;
@@ -25,8 +26,8 @@ struct Hrana {
 /*
     Move below code back into picasso if it doesnt work
 */
-uint32_t xLength, yLength;
-int segmentX, segmentY;
+extern xLength, yLength;
+int segmentSnakeX, segmentSnakeY;
 
 void DestroyPastir(Pastirnik* pastirStart) {
     Pastirnik* copyPastirCurrent = pastirStart;
@@ -57,30 +58,41 @@ int EatingFruit(Pastirnik* pastorStart, Fruit loop) {
 
 void DrawSnakeField() {
     int currentX = 0;
-    int currentY = 0;
+    int currentY = RESERVED;
 
     for (int i = 0; i < X_AMOUNT; i++) {
-        BSP_LCD_DrawVLine(0, currentX, 0, yLength, UTIL_LCD_COLOR_BLACK);
-        currentX += segmentX;
+        BSP_LCD_DrawVLine(0, currentX, RESERVED, yLength, UTIL_LCD_COLOR_BLACK);
+        currentX += segmentSnakeX;
     }
 
-    for (int i = 0; i < Y_AMOUNT; i++) {
+    for (int i = 0; i <= Y_AMOUNT; i++) {
         BSP_LCD_DrawHLine(0, 0, currentY, xLength, UTIL_LCD_COLOR_BLACK);
-        currentY += segmentY;
+        currentY += segmentSnakeY;
     }
 }
 
 void DrawSegmentAt(int x, int y, uint32_t color) {
-    int locationX = segmentX * x;
-    int locationY = segmentY * y;
+    int locationX = segmentSnakeX * x;
+    int locationY = segmentSnakeY * y;
 
-    BSP_LCD_FillRect(0, locationX, locationY, segmentX, segmentY, color);
+    BSP_LCD_FillRect(0, locationX, locationY+RESERVED, segmentSnakeX, segmentSnakeY, color);
 }
 
-void DrawGame(Pastirnik* pastirBegin, Fruit* loop) {
+void DrawSnakeGame(Pastirnik* pastirBegin, Fruit* loop, int score) {
     UTIL_LCD_Clear(UTIL_LCD_COLOR_WHITE);
     
-    DrawSegmentAt(loop->x, loop->y, UTIL_LCD_COLOR_ST_GREEN_DARK);
+    UTIL_LCD_SetFont(&Font24);
+    UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_ORANGE);
+    UTIL_LCD_SetBackColor(UTIL_LCD_COLOR_WHITE);
+    UTIL_LCD_DisplayStringAt(0, 0, (uint8_t*) "SNAKE", CENTER_MODE);
+    
+    char buffer[16];
+    sprintf(buffer, "value: %d", score);
+    UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_BLACK);
+    UTIL_LCD_DisplayStringAt(0, 30, (uint8_t*) buffer, CENTER_MODE);
+
+
+    DrawSegmentAt(loop->x, loop->y, UTIL_LCD_COLOR_LIGHTGREEN);
 
     Pastirnik* copyPastor = pastirBegin;
     while (copyPastor != NULL) {
@@ -91,7 +103,7 @@ void DrawGame(Pastirnik* pastirBegin, Fruit* loop) {
     DrawSnakeField();
 }
 
-int isOver(Pastirnik* pastirnik) {
+int isSnakeOver(Pastirnik* pastirnik) {
     Pastirnik* headOfPastirnik = pastirnik;
     while (headOfPastirnik->paster != NULL) {
         headOfPastirnik = headOfPastirnik->paster;
@@ -107,7 +119,7 @@ int isOver(Pastirnik* pastirnik) {
     return 0;
 }
 
-void TouchHandling(Pastirnik* pastir, TS_State_t* touchpadState) {
+void TouchSnakeHandling(Pastirnik* pastir, TS_State_t* touchpadState) {
     BSP_TS_GetState(0, touchpadState);
     if (touchpadState->TouchDetected) {
         Pastirnik* endOfPastir = pastir;
@@ -115,13 +127,13 @@ void TouchHandling(Pastirnik* pastir, TS_State_t* touchpadState) {
             endOfPastir = endOfPastir->paster;
         }
         if (endOfPastir->head == 1 || endOfPastir->head == 3) {
-            if (endOfPastir->y*segmentY < touchpadState->TouchY) {
+            if (endOfPastir->y*segmentSnakeY < touchpadState->TouchY) {
                 endOfPastir->head = 4;
             } else {
                 endOfPastir->head = 2;
             }
         } else {
-            if (endOfPastir->x*segmentX < touchpadState->TouchX) {
+            if (endOfPastir->x*segmentSnakeX < touchpadState->TouchX) {
                 endOfPastir->head = 1;
             } else {
                 endOfPastir->head = 3;
@@ -179,7 +191,7 @@ void Movement(Pastirnik* beginOfPastir, Pastirnik* endOfPastirnik) {
 
 }
 
-void GameCycle(Pastirnik** pastirnik, Fruit* loop) {
+void GameCycle(Pastirnik** pastirnik, Fruit* loop, int* score) {
     Pastirnik* beginOfPastir = *pastirnik;
 
     Pastirnik* endOfPastirnik = *pastirnik;
@@ -188,6 +200,8 @@ void GameCycle(Pastirnik** pastirnik, Fruit* loop) {
     }
 
     if (EatingFruit(*pastirnik, *loop) == 1) {
+        *score += 1;
+
         loop->x = rand() % X_AMOUNT;
         loop->y = rand() % Y_AMOUNT;
 
@@ -202,12 +216,16 @@ void GameCycle(Pastirnik** pastirnik, Fruit* loop) {
     Movement(beginOfPastir, endOfPastirnik);
 }
 
-void Picasso() {
+void Picasso(int* gameTracker) {
     BSP_LCD_GetXSize(0, &xLength);
     BSP_LCD_GetYSize(0, &yLength);
+    yLength = yLength - RESERVED;
+    if (yLength <= 0) {
+        return;
+    }
 
-    segmentX = xLength / X_AMOUNT;
-    segmentY = yLength / Y_AMOUNT;
+    segmentSnakeX = xLength / X_AMOUNT;
+    segmentSnakeY = yLength / Y_AMOUNT;
 
     UTIL_LCD_Clear(UTIL_LCD_COLOR_WHITE);
     UTIL_LCD_SetFont(&Font24);
@@ -229,19 +247,23 @@ void Picasso() {
     loop.x = rand() % X_AMOUNT;
     loop.y = rand() % Y_AMOUNT;
 
+    int score = 0;
+
     while (1) {
-        if(isOver(pastorStart)) {
+        if(isSnakeOver(pastorStart)) {
             UTIL_LCD_SetFont(&Font24);
             UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_DARKRED);
             UTIL_LCD_SetBackColor(UTIL_LCD_COLOR_BLACK);
             UTIL_LCD_DisplayStringAt(0, 250, (uint8_t *) "GAME OVER", CENTER_MODE);
+            DestroyPastir(pastorStart);
+            *gameTracker = 1;
             HAL_Delay(5000);
             break;
         }
-        TouchHandling(pastorStart, &state);
-        GameCycle(&pastorStart, &loop);
-        DrawGame(pastorStart, &loop);
-        HAL_Delay(1000);
+        TouchSnakeHandling(pastorStart, &state);
+        GameCycle(&pastorStart, &loop, &score);
+        DrawSnakeGame(pastorStart, &loop, score);
+        HAL_Delay(500);
     }
 
 }

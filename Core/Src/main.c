@@ -45,7 +45,8 @@ static void CPU_CACHE_Enable(void);
 
 #define GAME_DIMENSION 2
 
-uint32_t xxLength, yyLength;
+uint32_t xLength, yLength;
+int segmentGameX, segmentGameY;
 
 void ErrOutput() {
     UTIL_LCD_SetFont(&Font24);
@@ -56,53 +57,69 @@ void ErrOutput() {
     UTIL_LCD_DisplayStringAt(0, 0, (uint8_t *) "Failed", CENTER_MODE);
 }
 
-void DrawGameSegment(int x, int y, uint32_t color) {
-    int segmentX = xxLength / GAME_DIMENSION;
-    int segmentY = yyLength / GAME_DIMENSION;
+void DrawGameSegmentBackground(int x, int y, uint32_t color) {
+    int locationX = segmentGameX * x;
+    int locationY = segmentGameY * y;
 
-    int locationX = segmentX * x;
-    int locationY = segmentY * y;
+    BSP_LCD_FillRect(0, locationX, locationY, segmentGameX, segmentGameY, color);
+}
 
-    BSP_LCD_FillRect(0, locationX, locationY, segmentX, segmentY, color);
+void DrawGameSegmentForeground(int x, int y, int offsetX, int offsetY, uint32_t frontColor, uint32_t backColor, uint8_t* spring) {
+    
+    int locationX = segmentGameX * x;
+    int locationY = segmentGameY * y;
+  
+    UTIL_LCD_SetFont(&Font16);
+    UTIL_LCD_SetTextColor(frontColor);
+    UTIL_LCD_SetBackColor(backColor);
+    UTIL_LCD_DisplayStringAt(offsetX + locationX, offsetY + locationY, spring, LEFT_MODE);
 }
 
 void DrawPluralGames() {
     UTIL_LCD_Clear(UTIL_LCD_COLOR_WHITE);
     for (int i = 0; i < GAME_DIMENSION; i++) {
       for (int j = 0; j < GAME_DIMENSION; j++) {
-        if (i+j % 2 == 0) {
-          DrawGameSegment(i, j, UTIL_LCD_COLOR_ST_BLUE_DARK);
+        if ((i+j) % 2 == 0) {
+          DrawGameSegmentBackground(i, j, UTIL_LCD_COLOR_LIGHTBLUE);
         } else {
-          DrawGameSegment(i, j, UTIL_LCD_COLOR_DARKRED);
+          DrawGameSegmentBackground(i, j, UTIL_LCD_COLOR_LIGHTRED);
         }
       }
     }
+    DrawGameSegmentForeground(0, 0, segmentGameX / 2 - 10, segmentGameY / 2 - 10, UTIL_LCD_COLOR_GREEN, UTIL_LCD_COLOR_LIGHTBLUE, (uint8_t*) "Snake");
+    DrawGameSegmentForeground(1, 0, segmentGameX / 2 - 10, segmentGameY / 2 - 10, UTIL_LCD_COLOR_GREEN, UTIL_LCD_COLOR_LIGHTRED, (uint8_t*) "Minesweeper");
+    DrawGameSegmentForeground(0, 1, segmentGameX / 2 - 10, segmentGameY / 2 - 10, UTIL_LCD_COLOR_GREEN, UTIL_LCD_COLOR_LIGHTRED, (uint8_t*) "Tetris");
+    DrawGameSegmentForeground(1, 1, segmentGameX / 2 - 10, segmentGameY / 2 - 10, UTIL_LCD_COLOR_GREEN, UTIL_LCD_COLOR_LIGHTBLUE, (uint8_t*) "Hero Guitar");
+
+
+
+    UTIL_LCD_SetFont(&Font24);
+    UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_GREEN);
+    UTIL_LCD_SetBackColor(UTIL_LCD_COLOR_WHITE);
+    UTIL_LCD_DisplayStringAt(0, 0, (uint8_t *) "Game select", CENTER_MODE);
 }
 
 int pressChoice(int x, int y) {
     int selection = 0;
-    
-    int segmentX = xxLength / GAME_DIMENSION;
-    int segmentY = yyLength / GAME_DIMENSION;
 
     int currentX = 0;
-    int currentY = 0;
+    int currentY = segmentGameY;
     for (int i = 0; i < GAME_DIMENSION; i++) {
-      segmentX = 0;
+      currentX = segmentGameX;
       for (int j = 0; j < GAME_DIMENSION; j++) {
-        if (segmentX < x && segmentY < y) {
+        if (currentX > x && currentY > y) {
           return selection;
         }
         selection++;
-        currentX += segmentX;
+        currentX += segmentGameX;
       }
-      currentY += segmentY;
+      currentY += segmentGameY;
     }
 
     return -1;
 }
 
-void gameChoice(void) {
+void gameChoice(int* gameTracker) {
     TS_State_t state;
 
     BSP_TS_GetState(0, &state);
@@ -117,7 +134,10 @@ void gameChoice(void) {
     }
 
     if (decision == 0) {
-      Picasso();
+      Picasso(gameTracker);
+    }
+    if (decision == 1) {
+      Bombica(gameTracker);
     }
 
 }
@@ -149,12 +169,15 @@ int main(void)
   BSP_LCD_Init(0, LCD_ORIENTATION_LANDSCAPE);
   UTIL_LCD_SetFuncDriver(&LCD_Driver);
 
-  BSP_LCD_GetXSize(0, &xxLength);
-  BSP_LCD_GetYSize(0, &yyLength);
+  BSP_LCD_GetXSize(0, &xLength);
+  BSP_LCD_GetYSize(0, &yLength);
+
+  segmentGameX = xLength / GAME_DIMENSION;
+  segmentGameY = yLength / GAME_DIMENSION;
 
   TS_Init_t touch_init;
-  touch_init.Width = xxLength;
-  touch_init.Height = yyLength;
+  touch_init.Width = xLength;
+  touch_init.Height = yLength;
   touch_init.Orientation = TS_SWAP_XY;
   touch_init.Accuracy = 5;
 
@@ -162,15 +185,21 @@ int main(void)
   status = BSP_TS_Init(0, &touch_init);
   if (status != BSP_ERROR_NONE) {
   	ErrOutput();
-      return;
+      return NULL;
   }
 
   //Touchscreen_demo();
   /* Wait For User inputs */
   DrawPluralGames();
+
+  int gameTracker= 0;
   while (1)
   {
-    gameChoice();
+    gameChoice(&gameTracker);
+    if (gameTracker) {
+      gameTracker = 0;
+      DrawPluralGames();
+    }
   }
 }
 /**

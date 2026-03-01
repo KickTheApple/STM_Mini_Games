@@ -3,6 +3,7 @@
 "./Core/Components/mt25tl01g/mt25tl01g.o"
 "./Core/Components/mt48lc4m32b2/mt48lc4m32b2.o"
 "./Core/Src/main.o"
+"./Core/Src/minolovec.o"
 "./Core/Src/pisalec.o"
 "./Core/Src/stm32_lcd.o"
 "./Core/Src/stm32h750b_discovery.o"

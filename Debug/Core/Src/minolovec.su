@@ -1,0 +1,10 @@
+../Core/Src/minolovec.c:24:6:DrawMineField	32	static
+../Core/Src/minolovec.c:39:6:DrawMineGame	64	static
+../Core/Src/minolovec.c:72:5:isMineOver	24	static
+../Core/Src/minolovec.c:83:6:revealeration	32	static
+../Core/Src/minolovec.c:91:6:TouchMineHandling	24	static
+../Core/Src/minolovec.c:108:6:Grid_greeter	32	static
+../Core/Src/minolovec.c:184:6:Neighbor_greeter	24	static
+../Core/Src/minolovec.c:192:6:Bombarnik_randomizer	120	dynamic
+../Core/Src/minolovec.c:220:6:Bombarnik_starter	24	static
+../Core/Src/minolovec.c:230:6:Bombica	320	static

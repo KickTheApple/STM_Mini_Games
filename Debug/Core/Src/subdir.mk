@@ -6,6 +6,7 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Core/Src/main.c \
+../Core/Src/minolovec.c \
 ../Core/Src/pisalec.c \
 ../Core/Src/stm32_lcd.c \
 ../Core/Src/stm32h750b_discovery.c \
@@ -23,6 +24,7 @@ C_SRCS += \
 
 OBJS += \
 ./Core/Src/main.o \
+./Core/Src/minolovec.o \
 ./Core/Src/pisalec.o \
 ./Core/Src/stm32_lcd.o \
 ./Core/Src/stm32h750b_discovery.o \
@@ -40,6 +42,7 @@ OBJS += \
 
 C_DEPS += \
 ./Core/Src/main.d \
+./Core/Src/minolovec.d \
 ./Core/Src/pisalec.d \
 ./Core/Src/stm32_lcd.d \
 ./Core/Src/stm32h750b_discovery.d \
@@ -63,7 +66,7 @@ Core/Src/%.o Core/Src/%.su Core/Src/%.cyclo: ../Core/Src/%.c Core/Src/subdir.mk
 clean: clean-Core-2f-Src
 
 clean-Core-2f-Src:
-	-$(RM) ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/pisalec.cyclo ./Core/Src/pisalec.d ./Core/Src/pisalec.o ./Core/Src/pisalec.su ./Core/Src/stm32_lcd.cyclo ./Core/Src/stm32_lcd.d ./Core/Src/stm32_lcd.o ./Core/Src/stm32_lcd.su ./Core/Src/stm32h750b_discovery.cyclo ./Core/Src/stm32h750b_discovery.d ./Core/Src/stm32h750b_discovery.o ./Core/Src/stm32h750b_discovery.su ./Core/Src/stm32h750b_discovery_bus.cyclo ./Core/Src/stm32h750b_discovery_bus.d ./Core/Src/stm32h750b_discovery_bus.o ./Core/Src/stm32h750b_discovery_bus.su ./Core/Src/stm32h750b_discovery_lcd.cyclo ./Core/Src/stm32h750b_discovery_lcd.d ./Core/Src/stm32h750b_discovery_lcd.o ./Core/Src/stm32h750b_discovery_lcd.su ./Core/Src/stm32h750b_discovery_qspi.cyclo ./Core/Src/stm32h750b_discovery_qspi.d ./Core/Src/stm32h750b_discovery_qspi.o ./Core/Src/stm32h750b_discovery_qspi.su ./Core/Src/stm32h750b_discovery_sdram.cyclo ./Core/Src/stm32h750b_discovery_sdram.d ./Core/Src/stm32h750b_discovery_sdram.o ./Core/Src/stm32h750b_discovery_sdram.su ./Core/Src/stm32h750b_discovery_ts.cyclo ./Core/Src/stm32h750b_discovery_ts.d ./Core/Src/stm32h750b_discovery_ts.o ./Core/Src/stm32h750b_discovery_ts.su ./Core/Src/stm32h7xx_hal_msp.cyclo ./Core/Src/stm32h7xx_hal_msp.d ./Core/Src/stm32h7xx_hal_msp.o ./Core/Src/stm32h7xx_hal_msp.su ./Core/Src/stm32h7xx_it.cyclo ./Core/Src/stm32h7xx_it.d ./Core/Src/stm32h7xx_it.o ./Core/Src/stm32h7xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32h7xx.cyclo ./Core/Src/system_stm32h7xx.d ./Core/Src/system_stm32h7xx.o ./Core/Src/system_stm32h7xx.su ./Core/Src/touchscreen.cyclo ./Core/Src/touchscreen.d ./Core/Src/touchscreen.o ./Core/Src/touchscreen.su
+	-$(RM) ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/minolovec.cyclo ./Core/Src/minolovec.d ./Core/Src/minolovec.o ./Core/Src/minolovec.su ./Core/Src/pisalec.cyclo ./Core/Src/pisalec.d ./Core/Src/pisalec.o ./Core/Src/pisalec.su ./Core/Src/stm32_lcd.cyclo ./Core/Src/stm32_lcd.d ./Core/Src/stm32_lcd.o ./Core/Src/stm32_lcd.su ./Core/Src/stm32h750b_discovery.cyclo ./Core/Src/stm32h750b_discovery.d ./Core/Src/stm32h750b_discovery.o ./Core/Src/stm32h750b_discovery.su ./Core/Src/stm32h750b_discovery_bus.cyclo ./Core/Src/stm32h750b_discovery_bus.d ./Core/Src/stm32h750b_discovery_bus.o ./Core/Src/stm32h750b_discovery_bus.su ./Core/Src/stm32h750b_discovery_lcd.cyclo ./Core/Src/stm32h750b_discovery_lcd.d ./Core/Src/stm32h750b_discovery_lcd.o ./Core/Src/stm32h750b_discovery_lcd.su ./Core/Src/stm32h750b_discovery_qspi.cyclo ./Core/Src/stm32h750b_discovery_qspi.d ./Core/Src/stm32h750b_discovery_qspi.o ./Core/Src/stm32h750b_discovery_qspi.su ./Core/Src/stm32h750b_discovery_sdram.cyclo ./Core/Src/stm32h750b_discovery_sdram.d ./Core/Src/stm32h750b_discovery_sdram.o ./Core/Src/stm32h750b_discovery_sdram.su ./Core/Src/stm32h750b_discovery_ts.cyclo ./Core/Src/stm32h750b_discovery_ts.d ./Core/Src/stm32h750b_discovery_ts.o ./Core/Src/stm32h750b_discovery_ts.su ./Core/Src/stm32h7xx_hal_msp.cyclo ./Core/Src/stm32h7xx_hal_msp.d ./Core/Src/stm32h7xx_hal_msp.o ./Core/Src/stm32h7xx_hal_msp.su ./Core/Src/stm32h7xx_it.cyclo ./Core/Src/stm32h7xx_it.d ./Core/Src/stm32h7xx_it.o ./Core/Src/stm32h7xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32h7xx.cyclo ./Core/Src/system_stm32h7xx.d ./Core/Src/system_stm32h7xx.o ./Core/Src/system_stm32h7xx.su ./Core/Src/touchscreen.cyclo ./Core/Src/touchscreen.d ./Core/Src/touchscreen.o ./Core/Src/touchscreen.su
 
 .PHONY: clean-Core-2f-Src
 

@@ -22,6 +22,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stdio.h"
+#include "stdlib.h"
 #include "string.h"
 #include "stm32h7xx_hal.h"
 #include "stm32h750b_discovery.h"
@@ -45,7 +46,8 @@ uint8_t CheckForUserInput(void);
 void Toggle_Leds(void);
 void Touchscreen_DrawBackground_Circles(uint8_t state);
 uint8_t TouchScreen_GetTouchPosition(void);
-void Picasso(void);
+void Picasso(int* gameTracker);
+void Bombica(int* gameTracker);
 
 #endif /* __MAIN_H */
 
