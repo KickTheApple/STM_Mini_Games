@@ -48,6 +48,8 @@ void Touchscreen_DrawBackground_Circles(uint8_t state);
 uint8_t TouchScreen_GetTouchPosition(void);
 void Picasso(int* gameTracker);
 void Bombica(int* gameTracker);
+void Checkering(int* gameTracker);
+void Tetralnis(int* gameTracker);
 
 #endif /* __MAIN_H */
 

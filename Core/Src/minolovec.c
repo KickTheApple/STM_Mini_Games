@@ -1,5 +1,4 @@
 #include "main.h"
-#include <time.h>
 
 #define X_AMOUNT 12
 #define Y_AMOUNT 8
@@ -17,7 +16,7 @@ struct bombar {
     uint8_t neighbor;
 } typedef bombarnik;
 
-extern xLength, yLength;
+extern uint32_t xLength, yLength;
 int segmentMineX, segmentMineY;
 int spaceNumber;
 
@@ -59,8 +58,39 @@ void DrawMineGame(bombarnik bombPolje[Y_AMOUNT][X_AMOUNT]) {
                 locationX += segmentMineX;
                 continue;
             }
-            sprintf(buffer, "%d", bombPolje[i][j].neighbor);
-            UTIL_LCD_DisplayStringAt(locationX, locationY, (uint8_t*) buffer, LEFT_MODE);
+            if (bombPolje[i][j].neighbor) {
+                switch (bombPolje[i][j].neighbor) {
+                    case 1:
+                        UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_BLUE);
+                        break;
+                    case 2:
+                        UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_GREEN);
+                        break;
+                    case 3:
+                        UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_RED);
+                        break;
+                    case 4:
+                        UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_DARKBLUE);
+                        break;
+                    case 5:
+                        UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_BROWN);
+                        break;
+                    case 6:
+                        UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_CYAN);
+                        break;
+                    case 7:
+                        UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_BLACK);
+                        break;
+                    case 8:
+                        UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_GRAY);
+                        break;
+                    default:
+                        UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_RED);
+                }
+
+                sprintf(buffer, "%d", bombPolje[i][j].neighbor);
+                UTIL_LCD_DisplayStringAt(locationX, locationY, (uint8_t*) buffer, LEFT_MODE);
+            }
             locationX += segmentMineX;
         }
         locationY += segmentMineY;
@@ -80,11 +110,53 @@ int isMineOver(bombarnik bombPolje[Y_AMOUNT][X_AMOUNT]) {
     return 0;
 }
 
+void cascadingReveal(bombarnik bombPolje[Y_AMOUNT][X_AMOUNT], int x, int y, int direction) {
+    if (x < 0 || x == X_AMOUNT || y < 0 || y == Y_AMOUNT) {
+        return NULL;
+    }
+
+    if (bombPolje[y][x].isRevealed && direction != 0) {
+        return NULL;
+    }
+    
+    bombPolje[y][x].isRevealed = 1;
+    if (bombPolje[y][x].neighbor != 0) {
+        return NULL;
+    }
+
+    if (direction == 0) {
+        cascadingReveal(bombPolje, x, y-1, 1);
+        cascadingReveal(bombPolje, x+1, y, 2);
+        cascadingReveal(bombPolje, x, y+1, 3);
+        cascadingReveal(bombPolje, x-1, y, 4);
+    }
+
+    if (direction == 1) {
+        cascadingReveal(bombPolje, x, y-1, 1);
+        cascadingReveal(bombPolje, x+1, y, 1);
+    }
+    if (direction == 2) {
+        cascadingReveal(bombPolje, x+1, y, 2);
+        cascadingReveal(bombPolje, x, y+1, 2);
+    }
+    if (direction == 3) {
+        cascadingReveal(bombPolje, x, y+1, 3);
+        cascadingReveal(bombPolje, x-1, y, 3);
+    }
+    if (direction == 4) {
+        cascadingReveal(bombPolje, x-1, y, 4);
+        cascadingReveal(bombPolje, x, y-1, 4);
+    }
+}
+
 void revealeration(bombarnik bombPolje[Y_AMOUNT][X_AMOUNT], int x, int y) {
     int xReinterpreted = x / segmentMineX;
     int yReinterpreted = y / segmentMineY;
     if (!bombPolje[yReinterpreted][xReinterpreted].isRevealed) {
         bombPolje[yReinterpreted][xReinterpreted].isRevealed = 1;
+        if (bombPolje[yReinterpreted][xReinterpreted].neighbor == 0 && !bombPolje[yReinterpreted][xReinterpreted].isBomb) {
+            cascadingReveal(bombPolje, xReinterpreted, yReinterpreted, 0);
+        }
     }
 }
 
@@ -190,6 +262,8 @@ void Neighbor_greeter(bombarnik bombPolje[Y_AMOUNT][X_AMOUNT]) {
 }
 
 void Bombarnik_randomizer(bombarnik bombPolje[Y_AMOUNT][X_AMOUNT]) {
+    srand(time(NULL));
+
     bombarnik simplePolje[spaceNumber];
     int positioner = 0;
     for (int i = 0; i < Y_AMOUNT; i++) {
@@ -245,8 +319,6 @@ void Bombica(int* gameTracker) {
     spaceNumber = X_AMOUNT*Y_AMOUNT;
     bombarnik bombPolje[Y_AMOUNT][X_AMOUNT];
 
-    srand(time(NULL));
-
     Bombarnik_starter(bombPolje);
     Bombarnik_randomizer(bombPolje);
     Neighbor_greeter(bombPolje);
@@ -254,6 +326,7 @@ void Bombica(int* gameTracker) {
     while (1) {
         TouchMineHandling(bombPolje, &state, gameTracker);
         if (*gameTracker) {
+            HAL_Delay(5000);
             break;
         }
     }

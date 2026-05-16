@@ -77,6 +77,7 @@ void DrawGameSegmentForeground(int x, int y, int offsetX, int offsetY, uint32_t 
 
 void DrawPluralGames() {
     UTIL_LCD_Clear(UTIL_LCD_COLOR_WHITE);
+    /*
     for (int i = 0; i < GAME_DIMENSION; i++) {
       for (int j = 0; j < GAME_DIMENSION; j++) {
         if ((i+j) % 2 == 0) {
@@ -86,6 +87,7 @@ void DrawPluralGames() {
         }
       }
     }
+    */
     DrawGameSegmentForeground(0, 0, segmentGameX / 2 - 10, segmentGameY / 2 - 10, UTIL_LCD_COLOR_GREEN, UTIL_LCD_COLOR_LIGHTBLUE, (uint8_t*) "Snake");
     DrawGameSegmentForeground(1, 0, segmentGameX / 2 - 10, segmentGameY / 2 - 10, UTIL_LCD_COLOR_GREEN, UTIL_LCD_COLOR_LIGHTRED, (uint8_t*) "Minesweeper");
     DrawGameSegmentForeground(0, 1, segmentGameX / 2 - 10, segmentGameY / 2 - 10, UTIL_LCD_COLOR_GREEN, UTIL_LCD_COLOR_LIGHTRED, (uint8_t*) "Tetris");
@@ -138,6 +140,9 @@ void gameChoice(int* gameTracker) {
     }
     if (decision == 1) {
       Bombica(gameTracker);
+    }
+    if (decision == 2) {
+      Checkering(gameTracker);
     }
 
 }
