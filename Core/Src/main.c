@@ -58,10 +58,10 @@ void ErrOutput() {
 }
 
 void DrawGameSegmentBackground(int x, int y, uint32_t color) {
-    int locationX = segmentGameX * x;
-    int locationY = segmentGameY * y;
+    int locationX = segmentGameX * x + segmentGameX / 8;
+    int locationY = segmentGameY * y + segmentGameY / 8;
 
-    BSP_LCD_FillRect(0, locationX, locationY, segmentGameX, segmentGameY, color);
+    BSP_LCD_FillRect(0, locationX, locationY, segmentGameX*3/4, segmentGameY*3/4, color);
 }
 
 void DrawGameSegmentForeground(int x, int y, int offsetX, int offsetY, uint32_t frontColor, uint32_t backColor, uint8_t* spring) {
@@ -77,7 +77,6 @@ void DrawGameSegmentForeground(int x, int y, int offsetX, int offsetY, uint32_t 
 
 void DrawPluralGames() {
     UTIL_LCD_Clear(UTIL_LCD_COLOR_WHITE);
-    /*
     for (int i = 0; i < GAME_DIMENSION; i++) {
       for (int j = 0; j < GAME_DIMENSION; j++) {
         if ((i+j) % 2 == 0) {
@@ -87,18 +86,17 @@ void DrawPluralGames() {
         }
       }
     }
-    */
-    DrawGameSegmentForeground(0, 0, segmentGameX / 2 - 10, segmentGameY / 2 - 10, UTIL_LCD_COLOR_GREEN, UTIL_LCD_COLOR_LIGHTBLUE, (uint8_t*) "Snake");
-    DrawGameSegmentForeground(1, 0, segmentGameX / 2 - 10, segmentGameY / 2 - 10, UTIL_LCD_COLOR_GREEN, UTIL_LCD_COLOR_LIGHTRED, (uint8_t*) "Minesweeper");
-    DrawGameSegmentForeground(0, 1, segmentGameX / 2 - 10, segmentGameY / 2 - 10, UTIL_LCD_COLOR_GREEN, UTIL_LCD_COLOR_LIGHTRED, (uint8_t*) "Tetris");
-    DrawGameSegmentForeground(1, 1, segmentGameX / 2 - 10, segmentGameY / 2 - 10, UTIL_LCD_COLOR_GREEN, UTIL_LCD_COLOR_LIGHTBLUE, (uint8_t*) "Hero Guitar");
+    DrawGameSegmentForeground(0, 0, segmentGameX / 2 - 30, segmentGameY / 2 - 10, UTIL_LCD_COLOR_GREEN, UTIL_LCD_COLOR_LIGHTBLUE, (uint8_t*) "Snake");
+    DrawGameSegmentForeground(1, 0, segmentGameX / 2 - 60, segmentGameY / 2 - 10, UTIL_LCD_COLOR_GREEN, UTIL_LCD_COLOR_LIGHTRED, (uint8_t*) "Minesweeper");
+    DrawGameSegmentForeground(0, 1, segmentGameX / 2 - 50, segmentGameY / 2 - 10, UTIL_LCD_COLOR_GREEN, UTIL_LCD_COLOR_LIGHTRED, (uint8_t*) "Checkers");
+    DrawGameSegmentForeground(1, 1, segmentGameX / 2 - 20, segmentGameY / 2 - 10, UTIL_LCD_COLOR_GREEN, UTIL_LCD_COLOR_LIGHTBLUE, (uint8_t*) "None");
 
 
 
     UTIL_LCD_SetFont(&Font24);
     UTIL_LCD_SetTextColor(UTIL_LCD_COLOR_GREEN);
     UTIL_LCD_SetBackColor(UTIL_LCD_COLOR_WHITE);
-    UTIL_LCD_DisplayStringAt(0, 0, (uint8_t *) "Game select", CENTER_MODE);
+    UTIL_LCD_DisplayStringAt(0, yLength/2-12, (uint8_t *) "Game select", CENTER_MODE);
 }
 
 int pressChoice(int x, int y) {
@@ -202,6 +200,8 @@ int main(void)
   {
     gameChoice(&gameTracker);
     if (gameTracker) {
+      BSP_LCD_GetXSize(0, &xLength);
+      BSP_LCD_GetYSize(0, &yLength);
       gameTracker = 0;
       DrawPluralGames();
     }

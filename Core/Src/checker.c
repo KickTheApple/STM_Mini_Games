@@ -17,7 +17,7 @@ struct move {
     uint8_t startY;
 } typedef mover;
 
-extern xLength, yLength;
+extern uint32_t xLength, yLength;
 int segmentCheckerX, segmentCheckerY;
 
 uint8_t currentPlayer = BLUE_SPACE;

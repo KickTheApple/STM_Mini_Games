@@ -26,7 +26,7 @@ struct Hrana {
 /*
     Move below code back into picasso if it doesnt work
 */
-extern xLength, yLength;
+extern uint32_t xLength, yLength;
 int segmentSnakeX, segmentSnakeY;
 
 void DestroyPastir(Pastirnik* pastirStart) {
@@ -217,8 +217,6 @@ void GameCycle(Pastirnik** pastirnik, Fruit* loop, int* score) {
 }
 
 void Picasso(int* gameTracker) {
-    BSP_LCD_GetXSize(0, &xLength);
-    BSP_LCD_GetYSize(0, &yLength);
     yLength = yLength - RESERVED;
     if (yLength <= 0) {
         return;
